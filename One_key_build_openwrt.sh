@@ -9,7 +9,10 @@ do
         "Make_Screen")
             screen_name=$"r2s" #修改此处可更改screen名称
             screen -dmS $screen_name
-            cmd=$"cd FriendlyWrtR2s && bash One_key_build_openwrt.sh"
+            cmd=$"cd FriendlyWrtR2s"
+            screen -x -S $screen_name -p 0 -X stuff "$cmd"
+            screen -x -S $screen_name -p 0 -X stuff $'\n'
+            cmd=$"bash One_key_build_openwrt.sh"
             screen -x -S $screen_name -p 0 -X stuff "$cmd"
             screen -x -S $screen_name -p 0 -X stuff $'\n'
             screen -r $screen_name
@@ -24,7 +27,7 @@ do
             #安装R2s编译环境
             wget -O - https://raw.githubusercontent.com/friendlyarm/build-env-on-ubuntu-bionic/master/install.sh | bash                   
             ;;
-        "BuildingOpenWrt")
+        "BuildingOpenWrt")#使用lean最新版Openwrt源
             #拉取lede源码
             git clone https://github.com/coolsnowwolf/lede
             cd ~/lede/package/lean/
@@ -41,7 +44,7 @@ do
             make -j8 download V=s
             #make -j1 V=s
             make -j$(($(nproc) + 1)) V=s
-            #提取生成镜像
+            #提取生成镜像（R2s镜像，可根据编译平台自行修改）
             sudo mv -f ~/lede/bin/targets/rockchip/armv8/openwrt-rockchip-armv8-friendlyarm_nanopi-r2s*.img.gz ~/iosoutput/r2s
             cd ~/iosoutput/r2s
             gzip -d openwrt-rockchip-armv8-friendlyarm_nanopi-r2s*.img.gz
@@ -49,7 +52,7 @@ do
             mv openwrt-rockchip-armv8-friendlyarm_nanopi-r2s-ext4*.img friendlyarm_nanopi-r2s-ext4-`date "+%Y-%m-%d"`.img
             cd ~
             ;;
-        "BuildingWrt_R2s_Stable")
+        "BuildingWrt_R2s_Stable")#使用lean稳定版openwrt源
             #拉取Repo
             git clone https://github.com/friendlyarm/repo /repo 
             #安装Repo
@@ -77,8 +80,8 @@ do
             #拉取FriendlyWRT源码
             cd ~/friendlywrt-rk3328/
             #配置Git-config
-            git config --global user.name "xx@mail.com"
-            git config --global user.email "xx"
+            git config --global user.name "xx@mail.com"#需改成自己的邮箱
+            git config --global user.email "xx"#修改成自己的用户名
             repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master-v19.07.1 -m rk3328.xml --repo-url=https://github.com/friendlyarm/repo  --no-clone-bundle
             repo sync -c --no-clone-bundle
             sudo cp -rf ~/friendlywrt-rk3328/.repo/repo/repo /usr/bin/repo
@@ -117,8 +120,10 @@ do
             ;;
         "Re-build")
             cd ~/lede
+            #清除配置
             rm -rf ./tmp && rm -rf .config
             cd ~/lede
+            #更新Lean源
             git pull
             ./scripts/feeds update -a
             ./scripts/feeds install -a
@@ -128,9 +133,12 @@ do
             ;;
         "Re-build_R2s_Stable")
             cd ~/friendlywrt-rk3328/ 
+            #更新R2s源码
             repo sync -c --no-clone-bundle
+            #清除上次编译
             ./build.sh cleanall
             rm -rf ~/friendlywrt-rk3328/friendlywrt/tmp/
+            #重新编译
             cd ~/friendlywrt-rk3328/friendlywrt
             ./scripts/feeds update -a
             ./scripts/feeds install -a 
@@ -144,6 +152,6 @@ do
         "Quit")
             break
             ;;
-        *) echo invalid option;;
+        *) echo 输入有误请重新输入;;
     esac
 done
