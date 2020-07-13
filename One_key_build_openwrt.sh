@@ -13,6 +13,7 @@ do
             screen -x -S $screen_name -p 0 -X stuff "$cmd"
             screen -x -S $screen_name -p 0 -X stuff $'\n'
             screen -r $screen_name
+            ;;
         "Install_Environment")
             mkdir lede
             mkdir iosoutput
