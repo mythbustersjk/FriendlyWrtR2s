@@ -17,6 +17,10 @@ select opt in "${options[@]}"; do
         screen -r $screen_name
         ;;
     "Install_Environment")
+        #更新系统
+        sudo apt-get update 
+        sudo apt-get upgrade -y 
+        sudo apt-get dist-upgrade -y 
         mkdir lede
         mkdir iosoutput
         mkdir ~/iosoutput/r2s
