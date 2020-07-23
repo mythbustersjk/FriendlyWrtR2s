@@ -41,6 +41,7 @@ select opt in "${options[@]}"; do
         #git clone https://github.com/jerrykuku/luci-app-vssr.git
         #添加Adguardhome
         git clone https://github.com/rufengsuixing/luci-app-adguardhome
+        #安装feeds
         cd ~/lede
         ./scripts/feeds update -a
         ./scripts/feeds install -a
@@ -133,16 +134,29 @@ select opt in "${options[@]}"; do
         ;;
     "Re-build")
         cd ~/lede
-        #清除配置
         rm -rf ./tmp && rm -rf .config
+        #更新源码
         cd ~/lede
-        #更新Lean源
+        git reset --hard
         git pull
+        #更新Adguard
+        cd ~/lede/package/lean/luci-app-adguardhome
+        git reset --hard
+        git pull
+        #清除旧版feeds并更新
+        ./scripts/feeds clean
         ./scripts/feeds update -a
         ./scripts/feeds install -a
-        make defconfig
+        make menuconfig
         make -j8 download
         make -j$(($(nproc) + 1)) V=s
+        #提取镜像
+        sudo mv -f ~/lede/bin/targets/rockchip/armv8/openwrt-rockchip-armv8-friendlyarm_nanopi-r2s*.img.gz ~/iosoutput/r2s
+        cd ~/iosoutput/r2s
+        gzip -d openwrt-rockchip-armv8-friendlyarm_nanopi-r2s*.img.gz
+        mv openwrt-rockchip-armv8-friendlyarm_nanopi-r2s-squashfs*.img friendlyarm_nanopi-r2s-squashfs-`date "+%Y-%m-%d"`.img
+        mv openwrt-rockchip-armv8-friendlyarm_nanopi-r2s-ext4*.img friendlyarm_nanopi-r2s-ext4-`date "+%Y-%m-%d"`.img
+        cd ~
         ;;
     "Re-build_R2s_Stable")
         cd ~/friendlywrt-rk3328/
@@ -161,6 +175,9 @@ select opt in "${options[@]}"; do
         make -j8 download
         cd ~/friendlywrt-rk3328/
         ./build.sh nanopi_r2s.mk
+        #提取镜像
+        cd ~/
+        sudo mv -f ~/friendlywrt-rk3328/scripts/sd-fuse/out/FriendlyWrt*NanoPi-R2S_arm64_sd.img ~/iosoutput/r2s
         ;;
     "Quit")
         break
