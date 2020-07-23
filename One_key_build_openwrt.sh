@@ -32,6 +32,7 @@ select opt in "${options[@]}"; do
         ;;
     "BuildingOpenWrt") #使用lean最新版Openwrt源
         #拉取lede源码
+        cd ~/
         git clone https://github.com/coolsnowwolf/lede
         cd ~/lede/package/lean/
         #添加lua-maxminddb 依赖
@@ -56,6 +57,7 @@ select opt in "${options[@]}"; do
         cd ~
         ;;
     "BuildingWrt_R2s_Stable") #使用lean稳定版openwrt源
+        cd ~/
         #拉取Repo
         git clone https://github.com/friendlyarm/repo /repo
         #安装Repo
