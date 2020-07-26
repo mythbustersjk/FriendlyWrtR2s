@@ -1,5 +1,5 @@
 #!/bin/bash
-# Bash Menu Script Example
+#One_Key_Build_openwrt
 echo "OpenWrt一键编译脚本"
 PS3='Please enter your choice: '
 options=("Make_Screen" "Install_Environment" "BuildingOpenWrt" "BuildingWrt_R2s_Stable" "Re-build" "Re-build_R2s_Stable" "Quit")
